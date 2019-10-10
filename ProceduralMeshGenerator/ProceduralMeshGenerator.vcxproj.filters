@@ -14,4 +14,115 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CheckGLErrors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\glad.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextureStbImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\expat\stb_image\stb_image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\expat\imgui\imgui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\expat\imgui\imgui_demo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\expat\imgui\imgui_draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\expat\imgui\imgui_impl_glfw_gl3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CheckGLErrors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextureStbImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\expat\stb_image\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\expat\imgui\imconfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\expat\imgui\imgui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\expat\imgui\imgui_impl_glfw_gl3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\expat\imgui\imgui_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\expat\imgui\stb_rect_pack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\expat\imgui\stb_textedit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\expat\imgui\stb_truetype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shaders\1_FragmentShader.glsl" />
+    <None Include="src\shaders\1_VertexShader.glsl" />
+    <None Include="src\shaders\2_2_FragmentShader.glsl" />
+    <None Include="src\shaders\2_FragmentShader.glsl" />
+    <None Include="src\shaders\2_VertexShader.glsl" />
+    <None Include="src\shaders\3_LightFS.glsl" />
+    <None Include="src\shaders\3_LightVS.glsl" />
+    <None Include="src\shaders\4_LightMapFS.glsl" />
+    <None Include="src\shaders\5_DirectionalLightFS.glsl" />
+    <None Include="src\shaders\6_PointLightFS.glsl" />
+    <None Include="src\shaders\7_SpotLightFS.glsl" />
+    <None Include="src\shaders\7_SpotLightSmoothFS.glsl" />
+    <None Include="src\shaders\8_MixedLightFS.glsl" />
+    <None Include="src\shaders\9_ImportedModelShader.glsl" />
+    <None Include="src\shaders\10_TestFS.glsl" />
+    <None Include="src\shaders\10_TestVS.glsl" />
+    <None Include="src\shaders\11_TestFS.glsl" />
+    <None Include="src\shaders\11_TestVS.glsl" />
+  </ItemGroup>
 </Project>

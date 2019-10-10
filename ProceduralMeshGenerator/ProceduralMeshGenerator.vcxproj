@@ -69,7 +69,34 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(SolutionDir)Dependencies\Assimp\include\;$(SolutionDir)Dependencies\freetype\include\;$(SolutionDir)Dependencies\GLAD\include\;$(SolutionDir)Dependencies\GLFW\include\;$(SolutionDir)Dependencies\GLM\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <ReferencePath>$(VC_ReferencesPath_x86);</ReferencePath>
+    <LibraryPath>$(SolutionDir)Dependencies\Assimp\lib\;$(SolutionDir)Dependencies\freetype\lib\;$(SolutionDir)Dependencies\GLFW\lib\;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(SolutionDir)Dependencies\Assimp\include\;$(SolutionDir)Dependencies\freetype\include\;$(SolutionDir)Dependencies\GLAD\include\;$(SolutionDir)Dependencies\GLFW\include\;$(SolutionDir)Dependencies\GLM\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <ReferencePath>$(VC_ReferencesPath_x86);</ReferencePath>
+    <LibraryPath>$(SolutionDir)Dependencies\Assimp\lib\;$(SolutionDir)Dependencies\freetype\lib\;$(SolutionDir)Dependencies\GLFW\lib\;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(SolutionDir)Dependencies\Assimp\include\;$(SolutionDir)Dependencies\freetype\include\;$(SolutionDir)Dependencies\GLAD\include\;$(SolutionDir)Dependencies\GLFW\include\;$(SolutionDir)Dependencies\GLM\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <ReferencePath>$(VC_ReferencesPath_x64);</ReferencePath>
+    <LibraryPath>$(SolutionDir)Dependencies\Assimp\lib\;$(SolutionDir)Dependencies\freetype\lib\;$(SolutionDir)Dependencies\GLFW\lib\;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>$(SolutionDir)Dependencies\Assimp\include\;$(SolutionDir)Dependencies\freetype\include\;$(SolutionDir)Dependencies\GLAD\include\;$(SolutionDir)Dependencies\GLFW\include\;$(SolutionDir)Dependencies\GLM\;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <ReferencePath>$(VC_ReferencesPath_x64);</ReferencePath>
+    <LibraryPath>$(SolutionDir)Dependencies\Assimp\lib\;$(SolutionDir)Dependencies\freetype\lib\;$(SolutionDir)Dependencies\GLFW\lib\;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -77,6 +104,9 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>freetype.lib;assimp-vc141-mt.lib;opengl32.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -85,6 +115,9 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>assimp-vc141-mt.lib;opengl32.lib;freetype.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -98,6 +131,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>assimp-vc141-mt.lib;opengl32.lib;freetype.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -112,9 +146,61 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>assimp-vc141-mt.lib;opengl32.lib;freetype.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\CheckGLErrors.cpp" />
+    <ClCompile Include="src\expat\imgui\imgui.cpp" />
+    <ClCompile Include="src\expat\imgui\imgui_demo.cpp" />
+    <ClCompile Include="src\expat\imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\expat\imgui\imgui_impl_glfw_gl3.cpp" />
+    <ClCompile Include="src\expat\stb_image\stb_image.cpp" />
+    <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\TextureStbImage.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\CheckGLErrors.h" />
+    <ClInclude Include="src\expat\imgui\imconfig.h" />
+    <ClInclude Include="src\expat\imgui\imgui.h" />
+    <ClInclude Include="src\expat\imgui\imgui_impl_glfw_gl3.h" />
+    <ClInclude Include="src\expat\imgui\imgui_internal.h" />
+    <ClInclude Include="src\expat\imgui\stb_rect_pack.h" />
+    <ClInclude Include="src\expat\imgui\stb_textedit.h" />
+    <ClInclude Include="src\expat\imgui\stb_truetype.h" />
+    <ClInclude Include="src\expat\stb_image\stb_image.h" />
+    <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\Model.h" />
+    <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\TextureStbImage.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shaders\10_TestFS.glsl" />
+    <None Include="src\shaders\10_TestVS.glsl" />
+    <None Include="src\shaders\11_TestFS.glsl" />
+    <None Include="src\shaders\11_TestVS.glsl" />
+    <None Include="src\shaders\1_FragmentShader.glsl" />
+    <None Include="src\shaders\1_VertexShader.glsl" />
+    <None Include="src\shaders\2_2_FragmentShader.glsl" />
+    <None Include="src\shaders\2_FragmentShader.glsl" />
+    <None Include="src\shaders\2_VertexShader.glsl" />
+    <None Include="src\shaders\3_LightFS.glsl" />
+    <None Include="src\shaders\3_LightVS.glsl" />
+    <None Include="src\shaders\4_LightMapFS.glsl" />
+    <None Include="src\shaders\5_DirectionalLightFS.glsl" />
+    <None Include="src\shaders\6_PointLightFS.glsl" />
+    <None Include="src\shaders\7_SpotLightFS.glsl" />
+    <None Include="src\shaders\7_SpotLightSmoothFS.glsl" />
+    <None Include="src\shaders\8_MixedLightFS.glsl" />
+    <None Include="src\shaders\9_ImportedModelShader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
