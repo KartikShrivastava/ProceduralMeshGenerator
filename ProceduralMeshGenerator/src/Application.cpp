@@ -139,11 +139,11 @@ int main() {
 	Shader spotLightShader_7("src/shaders/1_VertexShader.glsl", "src/shaders/7_SpotLightSmoothFS.glsl");
 	Shader mixedLightShader_8("src/shaders/1_VertexShader.glsl", "src/shaders/8_MixedLightFS.glsl");
 
-	TextureStbImage tex1("res/textures/wood.jpg", false, 0);
-	TextureStbImage tex2("res/textures/yayi.png", true, 1);
-	TextureStbImage tex3("res/textures/diffuseMap.png", false, 2);
-	TextureStbImage tex4("res/textures/specularMap.png", false, 3);
-	TextureStbImage tex5("res/textures/emissionMap.png", false, 4);
+	TextureStbImage tex1("res/textures/wood.jpg", false);
+	TextureStbImage tex2("res/textures/yayi.png", true);
+	TextureStbImage tex3("res/textures/diffuseMap.png", false);
+	TextureStbImage tex4("res/textures/specularMap.png", false);
+	TextureStbImage tex5("res/textures/emissionMap.png", false);
 
 	glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	//glm::vec3 objectColor = glm::vec3(1.0f, 0.5f, 0.31f);		//used for 2_FragmentShader

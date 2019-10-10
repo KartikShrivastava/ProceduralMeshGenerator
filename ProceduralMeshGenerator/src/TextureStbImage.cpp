@@ -5,7 +5,7 @@
 #include "CheckGLErrors.h"
 #include "expat/stb_image/stb_image.h"
 
-TextureStbImage::TextureStbImage(const char * texturePath, bool flipVertically, int textureUnit){
+TextureStbImage::TextureStbImage(const char * texturePath, bool flipVertically){
 	GLCall(glGenTextures(1, &m_rendererID));
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_rendererID));
 
