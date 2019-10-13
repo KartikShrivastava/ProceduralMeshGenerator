@@ -10,6 +10,7 @@ private:
 public:
 	Shader(const char* vertexFilePath, const char* fragFilePath);
 
+	inline const unsigned int& GetID() const { return m_RendererID; }
 	unsigned int CompileShader(const char* filePath, GLenum type);
 	std::string GetShaderCode(const char* path);
 	bool CheckShaderErrors(const unsigned int& id, PFNGLGETSHADERIVPROC GetShaderiv, PFNGLGETSHADERINFOLOGPROC GetShaderInfoLog, 

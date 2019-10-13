@@ -64,8 +64,8 @@ Mesh Model::ProcessMesh(aiMesh * mesh, const aiScene * scene) {
 		std::vector<Texture> diffuse = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
 		textures.insert(textures.end(), diffuse.begin(), diffuse.end());
 
-		//std::vector<Texture> specular = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-		//textures.insert(textures.end(), specular.begin(), specular.end());
+		std::vector<Texture> specular = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+		textures.insert(textures.end(), specular.begin(), specular.end());
 	}
 
 	for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
@@ -101,7 +101,7 @@ std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType 
 	return textures;
 }
 
-void Model::Draw(Shader shader){
+void Model::Draw(Shader& shader){
 	for (unsigned int i = 0; i < meshes.size(); ++i) {
 		meshes[i].Draw(shader);
 	}

@@ -3,7 +3,7 @@
 #include "CheckGLErrors.h"
 #include "Mesh.h"
 
-Mesh::Mesh(std::vector<Vertex> v, std::vector<Texture> t, std::vector<unsigned int> i){
+Mesh::Mesh(const std::vector<Vertex>& v, const std::vector<Texture>& t, const std::vector<unsigned int>& i) {
 	vertices = v;
 	textures = t;
 	indices = i;
@@ -35,7 +35,7 @@ void Mesh::SetupMesh(){
 	glBindVertexArray(0);
 }
 
-void Mesh::Draw(Shader shader){
+void Mesh::Draw(Shader& shader){
 	unsigned int diffuseN = 1;
 	unsigned int specularN = 1;
 	for (unsigned int i = 0; i < textures.size(); ++i) {
@@ -47,7 +47,9 @@ void Mesh::Draw(Shader shader){
 		else if (name == "texture_specular")
 			number = std::to_string(specularN++);
 
-		shader.SetUniform1i(("u_material." + name + number).c_str(), i);
+		//shader.SetUniform1i(("u_material." + name + number).c_str(), i);
+		const GLchar* ch = ("u_material." + name + number).c_str();
+		glUniform1i(glGetUniformLocation(shader.GetID(), ch), i);
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
 

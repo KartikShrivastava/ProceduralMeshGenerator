@@ -22,5 +22,5 @@ private:
 
 public:
 	Model(const std::string& path);
-	void Draw(Shader shader);
+	void Draw(Shader& shader);
 };

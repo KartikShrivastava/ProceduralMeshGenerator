@@ -28,6 +28,6 @@ public:
 	std::vector<unsigned int> indices;
 	unsigned int VAO;
 
-	Mesh(std::vector<Vertex> v, std::vector<Texture> t, std::vector<unsigned int> i);
-	void Draw(Shader shader);
+	Mesh(const std::vector<Vertex>& v,const std::vector<Texture>& t,const std::vector<unsigned int>& i);
+	void Draw(Shader& shader);
 };
