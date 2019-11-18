@@ -164,6 +164,7 @@
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\TextureStbImage.cpp" />
+    <ClCompile Include="src\TrianglePicking.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
@@ -176,17 +177,20 @@
     <ClInclude Include="src\expat\imgui\stb_textedit.h" />
     <ClInclude Include="src\expat\imgui\stb_truetype.h" />
     <ClInclude Include="src\expat\stb_image\stb_image.h" />
+    <ClInclude Include="src\IRenderCallbacks.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\TextureStbImage.h" />
+    <ClInclude Include="src\TrianglePicking.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\10_TestFS.glsl" />
     <None Include="src\shaders\10_TestVS.glsl" />
     <None Include="src\shaders\11_TestFS.glsl" />
     <None Include="src\shaders\11_TestVS.glsl" />
+    <None Include="src\shaders\12_PickingFS.glsl" />
     <None Include="src\shaders\1_FragmentShader.glsl" />
     <None Include="src\shaders\1_VertexShader.glsl" />
     <None Include="src\shaders\2_2_FragmentShader.glsl" />
@@ -195,6 +199,7 @@
     <None Include="src\shaders\3_LightFS.glsl" />
     <None Include="src\shaders\3_LightVS.glsl" />
     <None Include="src\shaders\4_LightMapFS.glsl" />
+    <None Include="src\shaders\4_VertexShader.glsl" />
     <None Include="src\shaders\5_DirectionalLightFS.glsl" />
     <None Include="src\shaders\6_PointLightFS.glsl" />
     <None Include="src\shaders\7_SpotLightFS.glsl" />

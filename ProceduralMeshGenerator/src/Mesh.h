@@ -20,14 +20,16 @@ struct Texture {
 
 class Mesh {
 private:
-	unsigned int VBO, EBO;
 	void SetupMesh();
 public:
+	unsigned int VBO, EBO;
 	std::vector<Vertex> vertices;
 	std::vector<Texture> textures;
 	std::vector<unsigned int> indices;
 	unsigned int VAO;
 
 	Mesh(const std::vector<Vertex>& v,const std::vector<Texture>& t,const std::vector<unsigned int>& i);
-	void Draw(Shader& shader);
+	void Draw(const Shader& shader, const GLenum& primitiveType);
+	void Draw(const GLenum& primitiveType);
+	void Draw(Shader& shader, glm::mat4 projection, glm::mat4 view, glm::mat4 model, const GLenum& primitiveType, unsigned int primID);
 };

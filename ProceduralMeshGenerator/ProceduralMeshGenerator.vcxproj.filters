@@ -57,6 +57,9 @@
     <ClCompile Include="src\expat\imgui\imgui_impl_glfw_gl3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\TrianglePicking.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h">
@@ -104,6 +107,12 @@
     <ClInclude Include="src\expat\imgui\stb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\TrianglePicking.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IRenderCallbacks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\1_FragmentShader.glsl" />
@@ -124,5 +133,7 @@
     <None Include="src\shaders\10_TestVS.glsl" />
     <None Include="src\shaders\11_TestFS.glsl" />
     <None Include="src\shaders\11_TestVS.glsl" />
+    <None Include="src\shaders\12_PickingFS.glsl" />
+    <None Include="src\shaders\4_VertexShader.glsl" />
   </ItemGroup>
 </Project>

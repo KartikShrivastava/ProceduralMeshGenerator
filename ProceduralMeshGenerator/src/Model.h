@@ -22,5 +22,8 @@ private:
 
 public:
 	Model(const std::string& path);
-	void Draw(Shader& shader);
+	void Draw(const Shader& renderShader, const GLenum& primitiveType, Shader* trianglePickingShader);
+	void Draw(const GLenum& primitiveType, Shader* trianglePickingShader);
+	void Draw(Shader& shader, glm::mat4 projection, glm::mat4 view, glm::mat4 model, const GLenum& primitiveType, unsigned int drawID,	unsigned int primID);
+	void Manipulate(unsigned int drawID, unsigned int primitiveID);
 };

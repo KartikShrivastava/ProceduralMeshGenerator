@@ -17,6 +17,7 @@ public:
 							GLenum query, GLenum type, const char* filePath);
 	int GetUniformLocation(const char* name);
 	void SetUniform1i(const char* uniformName, unsigned int v);
+	void SetUniform1ui(const char* uniformName, unsigned int v);
 	void SetUniform1f(const char* uniformName, float v);
 	void SetUniform3f(const char* uniformName, float v1, float v2, float v3);
 	void SetUniform3fv(const char* uniformName, float* v);

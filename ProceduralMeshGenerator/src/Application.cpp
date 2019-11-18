@@ -17,16 +17,19 @@
 #include "Model.h"
 #include "expat/imgui/imgui.h"
 #include "expat/imgui/imgui_impl_glfw_gl3.h"
+#include "TrianglePicking.h"
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 void ProcessInput(GLFWwindow* window);
-void MouseCallback(GLFWwindow* window, double xpos, double ypos);
+static void MouseCallback(GLFWwindow* window, double xpos, double ypos);
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
-glm::vec3 lightPos = glm::vec3(-1.0f, 0.0, -1.0f);
-
 Renderer renderer;
-Camera camera;
+Camera camera(glm::vec3(0.0f, 0.0f, 10.0f));
+
+bool stopRendering = false;
+bool startPicking = false;
+float scalePickFactor = 1.0f;
 
 int main() {
 	if(!glfwInit())
@@ -36,18 +39,18 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(renderer.width, renderer.height, "OnethRenderer", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(renderer.width, renderer.height, "Procedural Mesh Generator", NULL, NULL);
 	if (window == NULL) {
 		std::cout << "Unable to create glfw window" << std::endl;
 		glfwTerminate();
 		return -1;
 	}
-	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
 	glfwSetCursorPosCallback(window, MouseCallback);
+
+	glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
 	glfwSetScrollCallback(window, ScrollCallback);
 
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwMakeContextCurrent(window);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Unable to intialize GLAD" << std::endl;
@@ -130,11 +133,12 @@ int main() {
 	GLCall(glEnableVertexAttribArray(1));
 	GLCall(glBindVertexArray(0));
 
-	Shader lampShader("src/shaders/3_LightVS.glsl", "src/shaders/3_LightFS.glsl");
+	Shader lampShader("src/shaders/4_VertexShader.glsl", "src/shaders/3_LightFS.glsl");
 	Shader mixedLightShader("src/shaders/1_VertexShader.glsl", "src/shaders/8_MixedLightFS.glsl");
+	Shader trianglePickingShader("src/shaders/4_VertexShader.glsl", "src/shaders/12_PickingFS.glsl");
 
 	TextureStbImage tex1("res/textures/wood.jpg", false);
-	tex1.Bind(0);
+	tex1.UnBind();
 
 	glm::vec3 pointLightPosition[] = {
 		glm::vec3(2.0f, -1.0f,  1.2f),
@@ -202,18 +206,26 @@ int main() {
 		mixedLightShader.UnBind();
 	}
 
-	Model crytek("res/EUL/EUL4.obj");
+	Model crytek("res/EUL3/EUL5.obj");
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_PROGRAM_POINT_SIZE);
+	glPointSize(1.5f);
 
 	ImGui::CreateContext();
 	ImGui_ImplGlfwGL3_Init(window, true);
 	ImGui::StyleColorsDark();
 
+	glm::vec3 modelPos[] = { glm::vec3(0.0f, 0.0f, 0.0f) };
 	glm::mat4 model;
 	glm::mat4 view;
 	glm::mat4 projection;
 	glm::mat4 mvp;
+
+	TrianglePicking trianglePicking;
+	if (!trianglePicking.Init(renderer.width, renderer.height)) {
+		std::cout << "Triangle picking is not initialized" << std::endl;
+	}
 
 	while (!glfwWindowShouldClose(window)) {
 		float currFrame = (float)glfwGetTime();
@@ -230,31 +242,101 @@ int main() {
 		view = camera.GetViewMatrix();
 		projection = glm::perspective(glm::radians(camera.fov), (float)renderer.width / renderer.height, 0.1f, 100.0f);
 
-		GLCall(glBindVertexArray(lampVao));
-		lampShader.Bind();
-		for (int i = 0; i < 4; ++i) {
-			model = glm::translate(glm::mat4(1.0f), pointLightPosition[i]);
-			model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+		{//picking phase
+			tex1.Bind(0);
+			model = glm::translate(glm::mat4(1.0f), modelPos[0]);
 			mvp = projection * view * model;
-			lampShader.SetUniform3fv("u_lightColor", glm::value_ptr(pointLightColors[i]));
-			lampShader.SetUniformMat4fv("u_mvp", glm::value_ptr(mvp));
-			GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
-		}
-		lampShader.UnBind();
 
-		mixedLightShader.Bind();
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(4.0f, -2.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-		mvp = projection * view * model;
-		mixedLightShader.SetUniformMat4fv("u_mvp", glm::value_ptr(mvp));
-		mixedLightShader.SetUniformMat4fv("u_model", glm::value_ptr(model));
-		mixedLightShader.SetUniform3fv("u_sLight.direction", glm::value_ptr(camera.front));
-		mixedLightShader.SetUniform3fv("u_camPos", glm::value_ptr(camera.position));
-		crytek.Draw(mixedLightShader);
-		mixedLightShader.UnBind();
+			trianglePicking.EnableWriting();
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			trianglePickingShader.Bind();
+
+			trianglePickingShader.SetUniform1ui("u_objectIndex", 0);
+			trianglePickingShader.SetUniformMat4fv("u_mvp", glm::value_ptr(mvp));
+			trianglePickingShader.SetUniform3f("u_scale", 1.0f, 1.0f, 1.0f);
+			crytek.Draw(GL_TRIANGLES, &trianglePickingShader);
+			trianglePickingShader.UnBind();
+
+			trianglePicking.DisableWriting();
+		}
+
+		{//render phase
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			if (renderer.mouseButtonPressed && startPicking) {
+				TrianglePicking::Pixel pixel = trianglePicking.ReadPixel(renderer.lastX, renderer.height - renderer.lastY - 1);
+				std::string str = std::to_string((unsigned int)pixel.objID) + std::to_string((unsigned int)pixel.drawID) + 
+					std::to_string((unsigned int)pixel.primitiveID);
+				if (renderer.primitiveIDStored.find(str) == renderer.primitiveIDStored.end()) {
+					renderer.primitiveIDStored.insert(str);
+					renderer.pixelID.push_back({ (unsigned int)pixel.objID, (unsigned int)pixel.drawID, (unsigned int)pixel.primitiveID });
+				}
+				//crytek.Draw(lampShader, projection, view, model, GL_TRIANGLES, pixel.drawID, pixel.primitiveID - 1);
+			}
+
+			for (int i = 0; i<renderer.pixelID.size(); ++i) {
+				if (renderer.pixelID[i].primitiveID != 0) {
+
+					lampShader.Bind();
+					model = glm::translate(glm::mat4(1.0f), modelPos[renderer.pixelID[i].objID]);
+					mvp = projection * view * model;
+					lampShader.SetUniformMat4fv("u_mvp", glm::value_ptr(mvp));
+					lampShader.SetUniform3f("u_scale", 1.0f*scalePickFactor, 1.0f*scalePickFactor, 1.0f*scalePickFactor);
+					lampShader.SetUniform3f("u_lightColor", 0.0f, 1.0f, 0.0f);
+
+					crytek.Draw(lampShader, projection, view, model, GL_TRIANGLES, renderer.pixelID[i].drawID, renderer.pixelID[i].primitiveID - 1);
+					lampShader.UnBind();
+				}
+			}
+
+			if (!stopRendering) {
+				mixedLightShader.Bind();
+
+				mixedLightShader.SetUniformMat4fv("u_mvp", glm::value_ptr(mvp));
+				mixedLightShader.SetUniformMat4fv("u_model", glm::value_ptr(model));
+				mixedLightShader.SetUniform3fv("u_sLight.direction", glm::value_ptr(camera.front));
+				mixedLightShader.SetUniform3fv("u_camPos", glm::value_ptr(camera.position));
+
+				crytek.Draw(mixedLightShader, GL_TRIANGLES, NULL);
+				mixedLightShader.UnBind();
+			}
+		}
+		
+		/*{
+			GLCall(glBindVertexArray(lampVao));
+			lampShader.Bind();
+
+			for (int i = 0; i < 4; ++i) {
+				model = glm::translate(glm::mat4(1.0f), pointLightPosition[i]);
+				model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+				mvp = projection * view * model;
+				lampShader.SetUniform3fv("u_lightColor", glm::value_ptr(pointLightColors[i]));
+				lampShader.SetUniformMat4fv("u_mvp", glm::value_ptr(mvp));
+				GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
+			}
+
+			lampShader.UnBind();
+		}*/
 
 		{
+			ImGui::Begin("Main menu");
 			ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
+			if (ImGui::IsWindowHovered())
+				renderer.isNotOverAnyWindow = false;
+			else
+				renderer.isNotOverAnyWindow = true;
+
+			if (renderer.mouseButtonPressed) {
+				ImGui::Text("x:%.3f, y:%.3f",renderer.lastX,renderer.lastY);
+			}
+
+			if (startPicking)
+				ImGui::Text("is picking");
+			else
+				ImGui::Text("not picking");
+
+			ImGui::End();
 		}
 
 		ImGui::Render();
@@ -268,6 +350,8 @@ int main() {
 	glDeleteVertexArrays(1, &lampVao);
 	glDeleteBuffers(1, &cubeVbo);
 
+	ImGui_ImplGlfwGL3_Shutdown();
+	ImGui::DestroyContext();
 	glfwTerminate();
 }
 
@@ -283,20 +367,6 @@ void ProcessInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
-		lightPos += glm::vec3(0.0f, 0.0f, -lightSpeed);
-	else if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		lightPos += glm::vec3(-lightSpeed, 0.0f, 0.0f);
-	else if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		lightPos += glm::vec3(0.0f, lightSpeed, 0.0f);
-
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		lightPos += glm::vec3(lightSpeed, 0.0f, 0.0f);
-	else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		lightPos += glm::vec3(0.0f, -lightSpeed, 0.0f);
-	else if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-		lightPos += glm::vec3(0.0f, 0.0f, lightSpeed);
-
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		camera.ProcessKeyboard(FORWARD, renderer.deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -306,10 +376,19 @@ void ProcessInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.ProcessKeyboard(RIGHT, renderer.deltaTime);
 
-	if(glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS)
-		renderer.mix = renderer.mix >= 1.0f ? 1.0f : renderer.mix + 0.001f;
-	if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS)
-		renderer.mix = renderer.mix <= 0.0f ? 0.0f : renderer.mix - 0.001f;
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		scalePickFactor += 0.05f;
+
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		scalePickFactor -= 0.05f;
+
+	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
+		stopRendering = true;
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+		stopRendering = false;
+	
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
+		startPicking = !startPicking;
 
 }
 
@@ -324,7 +403,17 @@ void MouseCallback(GLFWwindow* window, double xpos, double ypos) {
 	renderer.lastX = (float)xpos;
 	renderer.lastY = (float)ypos;
 
-	camera.ProcessMouse(xoffset, yoffset);
+	if (renderer.isNotOverAnyWindow && glfwGetMouseButton(window, 0) == GLFW_PRESS) {
+		//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		camera.ProcessMouse(xoffset, yoffset);
+		renderer.mouseRelease = false;
+		renderer.mouseButtonPressed = true;
+	}
+	else if (!renderer.mouseRelease && glfwGetMouseButton(window, 0) == GLFW_RELEASE) {
+		//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		renderer.mouseRelease = true;
+		renderer.mouseButtonPressed = false;
+	}
 }
 
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset) {

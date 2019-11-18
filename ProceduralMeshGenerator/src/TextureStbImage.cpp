@@ -43,11 +43,7 @@ void TextureStbImage::SetTexParameterfv(unsigned int target, unsigned int pname,
 	GLCall(glTexParameterfv(target, pname, params));
 }
 
-void TextureStbImage::Bind() const{
-	GLCall(glBindTexture(GL_TEXTURE_2D, m_rendererID));
-}
-
-void TextureStbImage::Bind(int textureUnit){
+void TextureStbImage::Bind(unsigned int textureUnit) const{
 	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, m_rendererID);
 }

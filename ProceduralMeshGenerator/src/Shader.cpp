@@ -85,6 +85,10 @@ void Shader::SetUniform1i(const char * uniformName,unsigned int v){
 	GLCall(glUniform1i(GetUniformLocation(uniformName), v));
 }
 
+void Shader::SetUniform1ui(const char * uniformName, unsigned int v){
+	GLCall(glUniform1ui(GetUniformLocation(uniformName), v));
+}
+
 void Shader::SetUniform1f(const char* uniformName, float v) {
 	GLCall(glUniform1f(GetUniformLocation(uniformName), v));
 }
