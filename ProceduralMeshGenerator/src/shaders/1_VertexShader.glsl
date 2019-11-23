@@ -11,14 +11,17 @@ layout (location = 2) in vec2 i_tex;
 
 uniform mat4 u_mvp;
 uniform mat4 u_model;
+uniform mat4 u_view;
 
 out vec2 t_texCoords;
 out vec3 t_normal;
 out vec3 t_worldPos;
+out vec3 t_viewPos;
 
 void main(){
 	gl_Position = u_mvp * i_pos;
 	t_texCoords = i_tex;
 	t_worldPos = vec3(u_model * i_pos);
 	t_normal = mat3(u_model) * i_normal;
+	t_viewPos = vec3(u_view * u_model * i_pos);
 }

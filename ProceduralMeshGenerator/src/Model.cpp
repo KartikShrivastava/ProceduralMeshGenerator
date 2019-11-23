@@ -137,7 +137,7 @@ unsigned int Model::LoadTextureFromFile(const char* path) {
 	return textureID;
 }
 
-void Model::Draw(const Shader& renderShader, const GLenum& primitiveType, Shader* trianglePickingShader){
+void Model::Draw(const Shader& renderShader, const GLenum& primitiveType){
 	for (unsigned int i = 0; i < meshes.size(); ++i) {
 		meshes[i].Draw(renderShader, primitiveType);
 	}
@@ -154,17 +154,4 @@ void Model::Draw(const GLenum& primitiveType, Shader* trianglePickingShader){
 
 void Model::Draw(Shader& shader, glm::mat4 projection, glm::mat4 view, glm::mat4 model, const GLenum& primitiveType, unsigned int drawID, unsigned int primID) {
 	meshes[drawID].Draw(shader, projection , view, model, primitiveType, primID);
-}
-
-void Model::Manipulate(unsigned int drawID, unsigned int primitiveID) {
-	meshes[drawID].vertices[primitiveID].position = glm::vec3(2.0f, 2.0f, 2.0f);
-	for (int j = 0; j < meshes.size(); ++j) {
-		//for (int i = 0; i < meshes[j].vertices.size(); i+=5) {
-		//}
-		glBindVertexArray(meshes[j].VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, meshes[j].VBO);
-		glBufferData(GL_ARRAY_BUFFER, meshes[j].vertices.size() * sizeof(Vertex), &meshes[j].vertices[0], GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-	}
 }

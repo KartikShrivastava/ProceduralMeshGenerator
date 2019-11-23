@@ -1,3 +1,4 @@
+#include <iostream>
 #include <glad/glad.h>
 
 #include "CheckGLErrors.h"
@@ -25,7 +26,7 @@ void Mesh::SetupMesh() {
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_DYNAMIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -58,6 +59,10 @@ void Mesh::Draw(const Shader& shader, const GLenum& primitiveType) {
 	}
 
 	glBindVertexArray(VAO);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glDrawElements(primitiveType, indices.size(), GL_UNSIGNED_INT, 0);
 
@@ -79,11 +84,7 @@ void Mesh::Draw(const GLenum& primitiveType) {	//for picking
 void Mesh::Draw(Shader& shader, glm::mat4 projection, glm::mat4 view, glm::mat4 model, const GLenum& primitiveType, unsigned int primID) {		//for drawing picked triangle
 	glBindVertexArray(VAO);
 
-	//model = glm::scale(glm::mat4(1.0f), glm::vec3(1.2f, 1.2f, 1.2f));
-	//glm::mat4 mvp = projection * view * model;
-	//shader.SetUniformMat4fv("u_mvp", glm::value_ptr(mvp));
-
-	//vertices[indices[primID]].position = glm::vec3(2.0f, 2.0f, 2.0f);
+	vertices[indices[primID*3]].position = glm::vec3(0.0f, -5.0f, 5.0f);
 	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	//glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_DYNAMIC_DRAW);
 	//glBindBuffer(GL_ARRAY_BUFFER, 0);

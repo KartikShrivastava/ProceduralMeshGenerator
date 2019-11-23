@@ -208,6 +208,8 @@ int main() {
 
 	Model crytek("res/EUL3/EUL5.obj");
 
+	glEnable(GL_CULL_FACE);
+
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_PROGRAM_POINT_SIZE);
 	glPointSize(1.5f);
@@ -263,8 +265,8 @@ int main() {
 
 		{//render phase
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			if (renderer.mouseButtonPressed && startPicking) {
+			if(glfwGetMouseButton(window, 0)==GLFW_PRESS && startPicking) {
+			//if (renderer.mouseButtonPressed && startPicking) {
 				TrianglePicking::Pixel pixel = trianglePicking.ReadPixel(renderer.lastX, renderer.height - renderer.lastY - 1);
 				std::string str = std::to_string((unsigned int)pixel.objID) + std::to_string((unsigned int)pixel.drawID) + 
 					std::to_string((unsigned int)pixel.primitiveID);
@@ -285,6 +287,11 @@ int main() {
 					lampShader.SetUniform3f("u_scale", 1.0f*scalePickFactor, 1.0f*scalePickFactor, 1.0f*scalePickFactor);
 					lampShader.SetUniform3f("u_lightColor", 0.0f, 1.0f, 0.0f);
 
+					glFlush();
+					glFinish();
+
+					glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
 					crytek.Draw(lampShader, projection, view, model, GL_TRIANGLES, renderer.pixelID[i].drawID, renderer.pixelID[i].primitiveID - 1);
 					lampShader.UnBind();
 				}
@@ -295,10 +302,11 @@ int main() {
 
 				mixedLightShader.SetUniformMat4fv("u_mvp", glm::value_ptr(mvp));
 				mixedLightShader.SetUniformMat4fv("u_model", glm::value_ptr(model));
+				mixedLightShader.SetUniformMat4fv("u_view", glm::value_ptr(view));
 				mixedLightShader.SetUniform3fv("u_sLight.direction", glm::value_ptr(camera.front));
 				mixedLightShader.SetUniform3fv("u_camPos", glm::value_ptr(camera.position));
 
-				crytek.Draw(mixedLightShader, GL_TRIANGLES, NULL);
+				crytek.Draw(mixedLightShader, GL_TRIANGLES);
 				mixedLightShader.UnBind();
 			}
 		}
@@ -327,14 +335,19 @@ int main() {
 			else
 				renderer.isNotOverAnyWindow = true;
 
-			if (renderer.mouseButtonPressed) {
-				ImGui::Text("x:%.3f, y:%.3f",renderer.lastX,renderer.lastY);
-			}
-
 			if (startPicking)
 				ImGui::Text("is picking");
 			else
 				ImGui::Text("not picking");
+
+			ImGui::SliderFloat("\nPalm\n", &scalePickFactor, 1.0f, 2.0f);
+			ImGui::SliderFloat("\nHand\n", &scalePickFactor, 1.0f, 2.0f);
+			ImGui::SliderFloat("\nStomach\n", &scalePickFactor, 1.0f, 2.0f);
+			ImGui::SliderFloat("\nLegs\n", &scalePickFactor, 1.0f, 2.0f);
+
+			if (renderer.mouseButtonPressed) {
+				ImGui::Text("x:%.3f, y:%.3f",renderer.lastX,renderer.lastY);
+			}
 
 			ImGui::End();
 		}
