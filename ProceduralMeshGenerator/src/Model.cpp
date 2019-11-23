@@ -10,7 +10,7 @@ Model::Model(const std::string& path){
 
 void Model::LoadModel(const std::string& path){
 	Assimp::Importer import;
-	const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+	const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 		std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
 	}
@@ -152,6 +152,6 @@ void Model::Draw(const GLenum& primitiveType, Shader* trianglePickingShader){
 	}
 }
 
-void Model::Draw(Shader& shader, glm::mat4 projection, glm::mat4 view, glm::mat4 model, const GLenum& primitiveType, unsigned int drawID, unsigned int primID) {
-	meshes[drawID].Draw(shader, projection , view, model, primitiveType, primID);
+void Model::Draw(const GLenum& primitiveType, unsigned int drawID, unsigned int primID, UpdatingVertex& uv) {
+	meshes[drawID].Draw(primitiveType, primID,uv);
 }

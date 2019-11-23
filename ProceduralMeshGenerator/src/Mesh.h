@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 
 #include "Shader.h"
+#include "UpdatingVertex.h"
 
 struct Vertex {
 	glm::vec3 position;
@@ -31,5 +32,5 @@ public:
 	Mesh(const std::vector<Vertex>& v,const std::vector<Texture>& t,const std::vector<unsigned int>& i);
 	void Draw(const Shader& shader, const GLenum& primitiveType);
 	void Draw(const GLenum& primitiveType);
-	void Draw(Shader& shader, glm::mat4 projection, glm::mat4 view, glm::mat4 model, const GLenum& primitiveType, unsigned int primID);
+	void Draw(const GLenum& primitiveType, unsigned int primID, UpdatingVertex& uv);
 };

@@ -60,10 +60,10 @@ uniform vec3 u_camPos;
 out vec4 o_color;
 
 void main(){
-	//vec3 normal = normalize(t_normal);
-	vec3 xTangent = dFdx(t_viewPos);
-	vec3 yTangent = dFdy(t_viewPos);
-	vec3 normal = normalize(cross(xTangent, yTangent));
+	vec3 normal = normalize(t_normal);
+	//vec3 xTangent = dFdx(t_viewPos);
+	//vec3 yTangent = dFdy(t_viewPos);
+	//vec3 normal = normalize(cross(xTangent, yTangent));
 	vec3 result = CalculateDirectionalLight(normal);
 	for(int i=0; i<NUM_POINT_LIGHTS; ++i){
 		result += CalculatePointLight(normal, u_pLight[i]);

@@ -8,6 +8,8 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <iomanip>
+#include <sstream>
 
 #include "Renderer.h"
 #include "Camera.h"
@@ -18,17 +20,23 @@
 #include "expat/imgui/imgui.h"
 #include "expat/imgui/imgui_impl_glfw_gl3.h"
 #include "TrianglePicking.h"
+#include "UpdatingVertex.h"
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 void ProcessInput(GLFWwindow* window);
 static void MouseCallback(GLFWwindow* window, double xpos, double ypos);
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+void CalculateCommonVertex();
 
 Renderer renderer;
 Camera camera(glm::vec3(0.0f, 0.0f, 10.0f));
+std::vector<UpdatingVertex> updatingTriangle;
+std::string commonVertex;
+std::vector<PMG::Vector3> commonVertexAddress;
 
 bool stopRendering = false;
-bool startPicking = false;
+bool isPicking = false;
+bool addTriangle = false;
 float scalePickFactor = 1.0f;
 
 int main() {
@@ -206,7 +214,7 @@ int main() {
 		mixedLightShader.UnBind();
 	}
 
-	Model crytek("res/EUL3/EUL5.obj");
+	Model crytek("res/EUL3/EUL6s.obj");
 
 	glEnable(GL_CULL_FACE);
 
@@ -265,35 +273,41 @@ int main() {
 
 		{//render phase
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			if(glfwGetMouseButton(window, 0)==GLFW_PRESS && startPicking) {
-			//if (renderer.mouseButtonPressed && startPicking) {
+			if(glfwGetMouseButton(window, 0)==GLFW_PRESS && isPicking) {
+
 				TrianglePicking::Pixel pixel = trianglePicking.ReadPixel(renderer.lastX, renderer.height - renderer.lastY - 1);
+
 				std::string str = std::to_string((unsigned int)pixel.objID) + std::to_string((unsigned int)pixel.drawID) + 
 					std::to_string((unsigned int)pixel.primitiveID);
-				if (renderer.primitiveIDStored.find(str) == renderer.primitiveIDStored.end()) {
-					renderer.primitiveIDStored.insert(str);
-					renderer.pixelID.push_back({ (unsigned int)pixel.objID, (unsigned int)pixel.drawID, (unsigned int)pixel.primitiveID });
+
+				if ((unsigned int)pixel.primitiveID != 0) {
+					if (renderer.primitiveIDStored.find(str) == renderer.primitiveIDStored.end()) {
+						renderer.primitiveIDStored.insert(str);
+
+						if (renderer.pixelID.size() && !addTriangle)
+							renderer.pixelID.pop_back();
+
+						renderer.pixelID.push_back({ (unsigned int)pixel.objID, (unsigned int)pixel.drawID, (unsigned int)pixel.primitiveID });
+						updatingTriangle.clear();
+						updatingTriangle.resize(renderer.pixelID.size());
+					}
 				}
-				//crytek.Draw(lampShader, projection, view, model, GL_TRIANGLES, pixel.drawID, pixel.primitiveID - 1);
 			}
 
-			for (int i = 0; i<renderer.pixelID.size(); ++i) {
-				if (renderer.pixelID[i].primitiveID != 0) {
+			if (isPicking) {
+				for (int i = 0; i < renderer.pixelID.size(); ++i) {
+					if (renderer.pixelID[i].primitiveID != 0) {
 
-					lampShader.Bind();
-					model = glm::translate(glm::mat4(1.0f), modelPos[renderer.pixelID[i].objID]);
-					mvp = projection * view * model;
-					lampShader.SetUniformMat4fv("u_mvp", glm::value_ptr(mvp));
-					lampShader.SetUniform3f("u_scale", 1.0f*scalePickFactor, 1.0f*scalePickFactor, 1.0f*scalePickFactor);
-					lampShader.SetUniform3f("u_lightColor", 0.0f, 1.0f, 0.0f);
+						lampShader.Bind();
+						model = glm::translate(glm::mat4(1.0f), modelPos[renderer.pixelID[i].objID]);
+						mvp = projection * view * model;
+						lampShader.SetUniformMat4fv("u_mvp", glm::value_ptr(mvp));
+						lampShader.SetUniform3f("u_scale", 1.0f*scalePickFactor, 1.0f*scalePickFactor, 1.0f*scalePickFactor);
+						lampShader.SetUniform3f("u_lightColor", 0.0f, 1.0f, 0.0f);
 
-					glFlush();
-					glFinish();
-
-					glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-					crytek.Draw(lampShader, projection, view, model, GL_TRIANGLES, renderer.pixelID[i].drawID, renderer.pixelID[i].primitiveID - 1);
-					lampShader.UnBind();
+						crytek.Draw(GL_TRIANGLES, renderer.pixelID[i].drawID, renderer.pixelID[i].primitiveID - 1, updatingTriangle[i]);
+						lampShader.UnBind();
+					}
 				}
 			}
 
@@ -335,18 +349,27 @@ int main() {
 			else
 				renderer.isNotOverAnyWindow = true;
 
-			if (startPicking)
-				ImGui::Text("is picking");
-			else
-				ImGui::Text("not picking");
+			ImGui::Checkbox("Is picking", &isPicking);
 
-			ImGui::SliderFloat("\nPalm\n", &scalePickFactor, 1.0f, 2.0f);
-			ImGui::SliderFloat("\nHand\n", &scalePickFactor, 1.0f, 2.0f);
-			ImGui::SliderFloat("\nStomach\n", &scalePickFactor, 1.0f, 2.0f);
-			ImGui::SliderFloat("\nLegs\n", &scalePickFactor, 1.0f, 2.0f);
+			ImGui::Checkbox("Add triangle", &addTriangle);
 
-			if (renderer.mouseButtonPressed) {
-				ImGui::Text("x:%.3f, y:%.3f",renderer.lastX,renderer.lastY);
+			if (ImGui::Button("Clear selection")) {
+				renderer.pixelID.clear();
+				renderer.primitiveIDStored.clear();
+			}
+
+			if (ImGui::Button("Change position")) {
+				if(updatingTriangle.size() >= 3) {
+					CalculateCommonVertex();
+				}
+			}
+
+			ImGui::Text(commonVertex.c_str());
+
+			if (!updatingTriangle.empty() && updatingTriangle.back().v1.x) {
+				ImGui::Text("v3: (%.3f, %.3f, %.3f)", *(updatingTriangle.back().v3.x), *(updatingTriangle.back().v3.y), *(updatingTriangle.back().v3.z));
+				ImGui::Text("v1: (%.3f, %.3f, %.3f)", *(updatingTriangle.back().v1.x), *(updatingTriangle.back().v1.y), *(updatingTriangle.back().v1.z));
+				ImGui::Text("v2: (%.3f, %.3f, %.3f)", *(updatingTriangle.back().v2.x), *(updatingTriangle.back().v2.y), *(updatingTriangle.back().v2.z));
 			}
 
 			ImGui::End();
@@ -401,7 +424,7 @@ void ProcessInput(GLFWwindow* window) {
 		stopRendering = false;
 	
 	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
-		startPicking = !startPicking;
+		isPicking = !isPicking;
 
 }
 
@@ -431,4 +454,77 @@ void MouseCallback(GLFWwindow* window, double xpos, double ypos) {
 
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 	camera.ProcessScroll((float)yoffset);
+}
+
+void CalculateCommonVertex() {
+	std::vector<std::string> vertexStr;
+
+	//atleat 3 faces should be compulsarily selected
+	for (int i = 0; i < updatingTriangle.size(); ++i) {
+		std::stringstream ss;
+
+		ss << std::fixed << std::setprecision(3) << *(updatingTriangle[i].v1.x);
+		ss << std::fixed << std::setprecision(3) << *(updatingTriangle[i].v1.y);
+		ss << std::fixed << std::setprecision(3) << *(updatingTriangle[i].v1.z);
+
+		vertexStr.push_back(ss.str());
+		ss.str(std::string());
+
+		ss << std::fixed << std::setprecision(3) << *(updatingTriangle[i].v2.x);
+		ss << std::fixed << std::setprecision(3) << *(updatingTriangle[i].v2.y);
+		ss << std::fixed << std::setprecision(3) << *(updatingTriangle[i].v2.z);
+
+		vertexStr.push_back(ss.str());
+		ss.str(std::string());
+
+		ss << std::fixed << std::setprecision(3) << *(updatingTriangle[i].v3.x);
+		ss << std::fixed << std::setprecision(3) << *(updatingTriangle[i].v3.y);
+		ss << std::fixed << std::setprecision(3) << *(updatingTriangle[i].v3.z);
+
+		vertexStr.push_back(ss.str());
+	}
+
+	int common1=-1, common2=-1, mainCommon=-1;
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 3; j < 6; j++) {
+			if (vertexStr[i] == vertexStr[j]) {
+				if (common1 == -1)
+					common1 = i;
+				else
+					common2 = i;
+			}
+		}
+	}
+
+	for (int i = 6; i < 9; ++i) {
+		if (vertexStr[i] == vertexStr[common1]) {
+			mainCommon = i;
+			commonVertex = vertexStr[i];
+		}
+		if (vertexStr[i] == vertexStr[common2]) {
+			mainCommon = i;
+			commonVertex = vertexStr[i];
+		}
+	}
+
+	//Store Common Vertex Index
+	commonVertexAddress.clear();
+
+	for (int i = 0; i < updatingTriangle.size(); ++i) {
+		if (commonVertex == vertexStr[i*3]) {
+			commonVertexAddress.push_back(updatingTriangle[i].v1);
+		}
+		else if (commonVertex == vertexStr[i*3+1]) {
+			commonVertexAddress.push_back(updatingTriangle[i].v2);
+		}
+		else {
+			commonVertexAddress.push_back(updatingTriangle[i].v3);
+		}
+	}
+
+	for (int i = 0; i < commonVertexAddress.size(); ++i) {
+		*(commonVertexAddress[i].x) = 0.8f;
+		*(commonVertexAddress[i].y) = -2.0f;
+		*(commonVertexAddress[i].z) = 1.5f;
+	}
 }

@@ -59,10 +59,6 @@ void Mesh::Draw(const Shader& shader, const GLenum& primitiveType) {
 	}
 
 	glBindVertexArray(VAO);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glDrawElements(primitiveType, indices.size(), GL_UNSIGNED_INT, 0);
 
@@ -81,13 +77,26 @@ void Mesh::Draw(const GLenum& primitiveType) {	//for picking
 	glActiveTexture(GL_TEXTURE0);
 }
 
-void Mesh::Draw(Shader& shader, glm::mat4 projection, glm::mat4 view, glm::mat4 model, const GLenum& primitiveType, unsigned int primID) {		//for drawing picked triangle
+void Mesh::Draw(const GLenum& primitiveType, unsigned int primID, UpdatingVertex& uv) {		//for drawing picked triangle
+	
 	glBindVertexArray(VAO);
 
-	vertices[indices[primID*3]].position = glm::vec3(0.0f, -5.0f, 5.0f);
-	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_DYNAMIC_DRAW);
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//fill address of updating vertex with right vertices
+	uv.v1.x = &(vertices[indices[primID * 3 + 0]].position.x);
+	uv.v1.y = &(vertices[indices[primID * 3 + 0]].position.y);
+	uv.v1.z = &(vertices[indices[primID * 3 + 0]].position.z);
+
+	uv.v2.x = &(vertices[indices[primID * 3 + 1]].position.x);
+	uv.v2.y = &(vertices[indices[primID * 3 + 1]].position.y);
+	uv.v2.z = &(vertices[indices[primID * 3 + 1]].position.z);
+
+	uv.v3.x = &(vertices[indices[primID * 3 + 2]].position.x);
+	uv.v3.y = &(vertices[indices[primID * 3 + 2]].position.y);
+	uv.v3.z = &(vertices[indices[primID * 3 + 2]].position.z);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glDrawElements(primitiveType, 3, GL_UNSIGNED_INT, (const void*)(primID * 3 * sizeof(unsigned int)));
 

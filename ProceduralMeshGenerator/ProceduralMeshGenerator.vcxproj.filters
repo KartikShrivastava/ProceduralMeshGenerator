@@ -113,6 +113,9 @@
     <ClInclude Include="src\IRenderCallbacks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\UpdatingVertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\1_FragmentShader.glsl" />

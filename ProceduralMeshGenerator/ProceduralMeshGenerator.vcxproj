@@ -184,6 +184,7 @@
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\TextureStbImage.h" />
     <ClInclude Include="src\TrianglePicking.h" />
+    <ClInclude Include="src\UpdatingVertex.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\10_TestFS.glsl" />
