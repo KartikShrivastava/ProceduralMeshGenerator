@@ -82,17 +82,29 @@ void Mesh::Draw(const GLenum& primitiveType, unsigned int primID, UpdatingVertex
 	glBindVertexArray(VAO);
 
 	//fill address of updating vertex with right vertices
-	uv.v1.x = &(vertices[indices[primID * 3 + 0]].position.x);
-	uv.v1.y = &(vertices[indices[primID * 3 + 0]].position.y);
-	uv.v1.z = &(vertices[indices[primID * 3 + 0]].position.z);
+	uv.vert1Pos.x = &(vertices[indices[primID * 3 + 0]].position.x);
+	uv.vert1Pos.y = &(vertices[indices[primID * 3 + 0]].position.y);
+	uv.vert1Pos.z = &(vertices[indices[primID * 3 + 0]].position.z);
 
-	uv.v2.x = &(vertices[indices[primID * 3 + 1]].position.x);
-	uv.v2.y = &(vertices[indices[primID * 3 + 1]].position.y);
-	uv.v2.z = &(vertices[indices[primID * 3 + 1]].position.z);
+	uv.vert2Pos.x = &(vertices[indices[primID * 3 + 1]].position.x);
+	uv.vert2Pos.y = &(vertices[indices[primID * 3 + 1]].position.y);
+	uv.vert2Pos.z = &(vertices[indices[primID * 3 + 1]].position.z);
 
-	uv.v3.x = &(vertices[indices[primID * 3 + 2]].position.x);
-	uv.v3.y = &(vertices[indices[primID * 3 + 2]].position.y);
-	uv.v3.z = &(vertices[indices[primID * 3 + 2]].position.z);
+	uv.vert3Pos.x = &(vertices[indices[primID * 3 + 2]].position.x);
+	uv.vert3Pos.y = &(vertices[indices[primID * 3 + 2]].position.y);
+	uv.vert3Pos.z = &(vertices[indices[primID * 3 + 2]].position.z);
+
+	uv.vert1Normal.x = &(vertices[indices[primID * 3 + 0]].normal.x);
+	uv.vert1Normal.y = &(vertices[indices[primID * 3 + 0]].normal.y);
+	uv.vert1Normal.z = &(vertices[indices[primID * 3 + 0]].normal.z);
+
+	uv.vert2Normal.x = &(vertices[indices[primID * 3 + 1]].normal.x);
+	uv.vert2Normal.y = &(vertices[indices[primID * 3 + 1]].normal.y);
+	uv.vert2Normal.z = &(vertices[indices[primID * 3 + 1]].normal.z);
+
+	uv.vert3Normal.x = &(vertices[indices[primID * 3 + 2]].normal.x);
+	uv.vert3Normal.y = &(vertices[indices[primID * 3 + 2]].normal.y);
+	uv.vert3Normal.z = &(vertices[indices[primID * 3 + 2]].normal.z);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_DYNAMIC_DRAW);

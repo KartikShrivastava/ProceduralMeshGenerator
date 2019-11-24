@@ -1,6 +1,5 @@
 #pragma once
 
-#include "IRenderCallbacks.h"
 #include "Shader.h"
 
 class TrianglePicking {

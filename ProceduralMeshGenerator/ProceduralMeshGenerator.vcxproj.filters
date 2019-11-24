@@ -60,6 +60,9 @@
     <ClCompile Include="src\TrianglePicking.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\BodyPart.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h">
@@ -110,10 +113,10 @@
     <ClInclude Include="src\TrianglePicking.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\IRenderCallbacks.h">
+    <ClInclude Include="src\UpdatingVertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\UpdatingVertex.h">
+    <ClInclude Include="src\BodyPart.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
