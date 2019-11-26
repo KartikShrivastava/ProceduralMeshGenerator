@@ -8,13 +8,12 @@
 class BodyPart {
 public:
 	std::vector<UpdatingVertex> updatingTriangle;
-	std::string commonVertex;
-	std::vector<PMG::Vector3> commonVertexAddress;
+	std::vector<PMG::Vector3> commonVertexPosAdd;
 	float adjust = 0.0f;
-	glm::vec3 initialPos;
-	std::vector<glm::vec3> normalDirs;
-	std::vector<glm::vec3> commonNodesPos;
+	std::vector<glm::vec3> commonVertInitialPos;
+	std::vector<glm::vec3> commonVertNormals;
 
 	void FindCommonVertex();
 	void Adjust();
+	void Clear();
 };

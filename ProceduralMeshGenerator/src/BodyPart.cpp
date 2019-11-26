@@ -39,6 +39,7 @@ void BodyPart::FindCommonVertex(){
 
 	if (vertexStr.size() < 6) {
 		__debugbreak();
+		return;
 	}
 
 	std::unordered_map<std::string, int> commonNodes;
@@ -71,98 +72,79 @@ void BodyPart::FindCommonVertex(){
 			}
 		}
 	}
+	
 
+	float normalx = 0.0f, normaly = 0.0f, normalz = 0.0f;
+	std::unordered_map<std::string, glm::vec3> normalMap;
+	
+	int count = 0;
+	int pickThreshold = 3;
+
+	for (auto itr : commonNodes) {
+		if (itr.second > pickThreshold) {
+			count++;
+			normalMap[itr.first] = glm::vec3(0.0f, 0.0f, 0.0f);
+		}
+	}
+
+	for (int i = 0; i < vertexStr.size(); ++i) {
+		if (commonNodes.find(vertexStr[i]) != commonNodes.end()) {
+			if (i % 3 == 0) {
+				normalMap[vertexStr[i]] += glm::vec3(*(updatingTriangle[i / 3].vert1Normal.x), *(updatingTriangle[i / 3].vert1Normal.y),
+					*(updatingTriangle[i / 3].vert1Normal.z));
+			}
+			else if (i % 3 == 1) {
+				normalMap[vertexStr[i]] += glm::vec3(*(updatingTriangle[i / 3].vert2Normal.x), *(updatingTriangle[i / 3].vert2Normal.y),
+					*(updatingTriangle[i / 3].vert2Normal.z));
+			}
+			else if (i % 3 == 2) {
+				normalMap[vertexStr[i]] += glm::vec3(*(updatingTriangle[i / 3].vert3Normal.x), *(updatingTriangle[i / 3].vert3Normal.y),
+					*(updatingTriangle[i / 3].vert3Normal.z));
+			}
+		}
+	}
 
 	for (int i = 0; i < vertexStr.size(); ++i) {
 		auto itr = commonNodes.find(vertexStr[i]);
-		if (itr != commonNodes.end() && itr->second>2 ) {
-			commonNodes.erase(itr);
+		if (itr != commonNodes.end() && itr->second> pickThreshold) {
+			//commonNodes.erase(itr);
 			if (i % 3 == 0) {
-				commonNodesPos.push_back(glm::vec3(*(updatingTriangle[i / 3].vert1Pos.x), *(updatingTriangle[i / 3].vert1Pos.y),
+				commonVertexPosAdd.push_back(updatingTriangle[i / 3].vert1Pos);
+				commonVertInitialPos.push_back(glm::vec3(*(updatingTriangle[i / 3].vert1Pos.x), *(updatingTriangle[i / 3].vert1Pos.y),
 					*(updatingTriangle[i / 3].vert1Pos.z)));
+				commonVertNormals.push_back(glm::vec3(normalMap[vertexStr[i]].x / count, normalMap[vertexStr[i]].y / count,
+					normalMap[vertexStr[i]].z / count));
 			}
 			else if (i % 3 == 1) {
-				commonNodesPos.push_back(glm::vec3(*(updatingTriangle[i / 3].vert2Pos.x), *(updatingTriangle[i / 3].vert2Pos.y),
+				commonVertexPosAdd.push_back(updatingTriangle[i / 3].vert2Pos);
+				commonVertInitialPos.push_back(glm::vec3(*(updatingTriangle[i / 3].vert2Pos.x), *(updatingTriangle[i / 3].vert2Pos.y),
 					*(updatingTriangle[i / 3].vert2Pos.z)));
+				commonVertNormals.push_back(glm::vec3(normalMap[vertexStr[i]].x / count, normalMap[vertexStr[i]].y / count,
+					normalMap[vertexStr[i]].z / count));
 			}
 			else if (i % 3 == 2) {
-				commonNodesPos.push_back(glm::vec3(*(updatingTriangle[i / 3].vert3Pos.x), *(updatingTriangle[i / 3].vert3Pos.y),
+				commonVertexPosAdd.push_back(updatingTriangle[i / 3].vert3Pos);
+				commonVertInitialPos.push_back(glm::vec3(*(updatingTriangle[i / 3].vert3Pos.x), *(updatingTriangle[i / 3].vert3Pos.y),
 					*(updatingTriangle[i / 3].vert3Pos.z)));
+				commonVertNormals.push_back(glm::vec3(normalMap[vertexStr[i]].x / count, normalMap[vertexStr[i]].y / count,
+					normalMap[vertexStr[i]].z / count));
 			}
 		}
 	}
-	
-	int count = 0;
-	for (auto itr : commonNodes) {
-		std::cout << itr.first << ":" << itr.second << std::endl;
-		if (itr.second > 2)
-			count++;
-	}
-	
-	int f = count;
-
-	/*int common1 = -1, common2 = -1, mainCommon = -1;
-	for (int i = 0; i < 3; ++i) {
-		for (int j = 3; j < 6; j++) {
-			if (vertexStr[i] == vertexStr[j]) {
-				if (common1 == -1)
-					common1 = i;
-				else
-					common2 = i;
-			}
-		}
-	}
-
-	for (int i = 6; i < 9; ++i) {
-		if (vertexStr[i] == vertexStr[common1]) {
-			mainCommon = i;
-			commonVertex = vertexStr[i];
-		}
-		if (vertexStr[i] == vertexStr[common2]) {
-			mainCommon = i;
-			commonVertex = vertexStr[i];
-		}
-	}
-
-	//Store Common Vertex Index
-	commonVertexAddress.clear();
-
-	//store sum of normals and find their average
-	float normalx = 0.0f, normaly = 0.0f, normalz = 0.0f;
-
-	for (int i = 0; i < updatingTriangle.size(); ++i) {
-		if (commonVertex == vertexStr[i * 3 + 0]) {
-			commonVertexAddress.push_back(updatingTriangle[i].vert1Pos);
-			normalx += *(updatingTriangle[i].vert1Normal.x);
-			normaly += *(updatingTriangle[i].vert1Normal.y);
-			normalz += *(updatingTriangle[i].vert1Normal.z);
-		}
-		else if (commonVertex == vertexStr[i * 3 + 1]) {
-			commonVertexAddress.push_back(updatingTriangle[i].vert2Pos);
-			normalx += *(updatingTriangle[i].vert2Normal.x);
-			normaly += *(updatingTriangle[i].vert2Normal.y);
-			normalz += *(updatingTriangle[i].vert2Normal.z);
-		}
-		else if (commonVertex == vertexStr[i * 3 + 2]) {
-			commonVertexAddress.push_back(updatingTriangle[i].vert3Pos);
-			normalx += *(updatingTriangle[i].vert3Normal.x);
-			normaly += *(updatingTriangle[i].vert3Normal.y);
-			normalz += *(updatingTriangle[i].vert3Normal.z);
-		}
-	}
-
-	initialPos = glm::vec3(*(commonVertexAddress[0].x), *(commonVertexAddress[0].y), *(commonVertexAddress[0].z));
-
-	int sz = commonVertexAddress.size();
-
-	normalDirs.push_back(glm::vec3(normalx / sz, normaly / sz, normalz / sz));*/
 }
 
 void BodyPart::Adjust() {
 
-	for (int i = 0; i < commonVertexAddress.size(); ++i) {
-		*(commonVertexAddress[i].x) = initialPos.x + adjust * normalDirs[0].x;
-		*(commonVertexAddress[i].y) = initialPos.y + adjust * normalDirs[0].y;
-		*(commonVertexAddress[i].z) = initialPos.z + adjust * normalDirs[0].z;
+	for (int i = 0; i < commonVertexPosAdd.size(); ++i) {
+		*(commonVertexPosAdd[i].x) = commonVertInitialPos[i].x + adjust * commonVertNormals[i].x;
+		*(commonVertexPosAdd[i].y) = commonVertInitialPos[i].y + adjust * commonVertNormals[i].y;
+		*(commonVertexPosAdd[i].z) = commonVertInitialPos[i].z + adjust * commonVertNormals[i].z;
 	}
+}
+
+void BodyPart::Clear() {
+	updatingTriangle.clear();
+	commonVertexPosAdd.clear();
+	commonVertInitialPos.clear();
+	commonVertNormals.clear();
 }

@@ -188,6 +188,7 @@
     <ClInclude Include="src\UpdatingVertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram.cd" />
     <None Include="src\shaders\10_TestFS.glsl" />
     <None Include="src\shaders\10_TestVS.glsl" />
     <None Include="src\shaders\11_TestFS.glsl" />

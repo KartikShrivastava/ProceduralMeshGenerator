@@ -28,13 +28,6 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 Renderer renderer;
 Camera camera(glm::vec3(0.0f, 0.0f, 10.0f));
 
-float adjustStomach = 0.0f;
-float highlightOpacity = 0.8f;
-
-bool stopRendering = false;
-bool isPicking = false;
-bool addTriangle = false;
-
 int main() {
 	if(!glfwInit())
 		return -1;
@@ -60,62 +53,11 @@ int main() {
 		std::cout << "Unable to intialize GLAD" << std::endl;
 		return -1;
 	}
-
-	float verticesPlane[] = {
-		-0.5f, -0.5f,  0.0f,	0.0f, 0.0f,
-		 0.5f, -0.5f,  0.0f,	1.0f, 0.0f,
-		-0.5f,  0.5f,  0.0f,	0.0f, 1.0f,
-		 0.5f,  0.5f,  0.0f,	1.0f, 1.0f
-	};
-
-	float verticesBox[] = {
-	-0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,    0.0f, 0.0f,
-	 0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,    1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,    1.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,    1.0f, 1.0f,
-	-0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,    0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,    0.0f, 0.0f,
-
-	-0.5f, -0.5f,  0.5f,    0.0f,  0.0f,  1.0f,    0.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,    0.0f,  0.0f,  1.0f,    1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,    0.0f,  0.0f,  1.0f,    1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,    0.0f,  0.0f,  1.0f,    1.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,    0.0f,  0.0f,  1.0f,    0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,    0.0f,  0.0f,  1.0f,    0.0f, 0.0f,
-
-	-0.5f,  0.5f,  0.5f,   -1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,   -1.0f,  0.0f,  0.0f,    1.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,   -1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,   -1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,   -1.0f,  0.0f,  0.0f,    0.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,   -1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
-
-	 0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,    1.0f,  0.0f,  0.0f,    1.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,    1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,    1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,    1.0f,  0.0f,  0.0f,    0.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
-
-	-0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,    0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,    1.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,    1.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,    1.0f, 0.0f,
-	-0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,    0.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,    0.0f, 1.0f,
-
-	-0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,    0.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,    1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,    1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,    1.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,    0.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,    0.0f, 1.0f
-	};
 	
 	unsigned int cubeVbo;
 	GLCall(glGenBuffers(1, &cubeVbo));
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, cubeVbo));
-	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(verticesBox), verticesBox, GL_STATIC_DRAW));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(renderer.verticesBox), renderer.verticesBox, GL_STATIC_DRAW));
 	
 	unsigned int texCubeVao;
 	GLCall(glGenVertexArrays(1, &texCubeVao));
@@ -209,7 +151,7 @@ int main() {
 		mixedLightShader.UnBind();
 	}
 
-	Model crytek("res/EUL3/EUL6.obj");
+	Model human("res/EUL/EUL4.obj");
 
 	glEnable(GL_CULL_FACE);
 
@@ -264,7 +206,7 @@ int main() {
 
 			trianglePickingShader.SetUniform1ui("u_objectIndex", 0);
 			trianglePickingShader.SetUniformMat4fv("u_mvp", glm::value_ptr(mvp));
-			crytek.Draw(GL_TRIANGLES, &trianglePickingShader);
+			human.Draw(GL_TRIANGLES, &trianglePickingShader);
 			trianglePickingShader.UnBind();
 
 			trianglePicking.DisableWriting();
@@ -275,7 +217,7 @@ int main() {
 		{//render phase
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			if(glfwGetMouseButton(window, 0)==GLFW_PRESS && isPicking) {
+			if(glfwGetMouseButton(window, 0)==GLFW_PRESS && renderer.isPicking) {
 
 				TrianglePicking::Pixel pixel = trianglePicking.ReadPixel(renderer.lastX, renderer.height - renderer.lastY - 1);
 
@@ -286,7 +228,7 @@ int main() {
 					if (renderer.primitiveIDStored.find(str) == renderer.primitiveIDStored.end()) {
 						renderer.primitiveIDStored.insert(str);
 
-						if (renderer.pixelID.size() && !addTriangle)
+						if (renderer.pixelID.size() && !renderer.addTriangle)
 							renderer.pixelID.pop_back();
 
 						renderer.pixelID.push_back({ (unsigned int)pixel.objID, (unsigned int)pixel.drawID, (unsigned int)pixel.primitiveID });
@@ -296,7 +238,7 @@ int main() {
 				}
 			}
 
-			if (!stopRendering) {
+			if (!renderer.stopRendering) {
 				mixedLightShader.Bind();
 
 				mixedLightShader.SetUniformMat4fv("u_mvp", glm::value_ptr(mvp));
@@ -305,17 +247,18 @@ int main() {
 				mixedLightShader.SetUniform3fv("u_sLight.direction", glm::value_ptr(camera.front));
 				mixedLightShader.SetUniform3fv("u_camPos", glm::value_ptr(camera.position));
 
-				crytek.Draw(mixedLightShader, GL_TRIANGLES);
+				human.Draw(mixedLightShader, GL_TRIANGLES);
 				mixedLightShader.UnBind();
 			}
 
-			if (isPicking) {
+			if (renderer.isPicking) {
 				glDepthFunc(GL_ALWAYS);
+				
 				highlightShader.Bind();
-				highlightShader.SetUniform4f("u_lightColor", 0.0f, 1.0f, 0.0f, highlightOpacity);
+				highlightShader.SetUniform4f("u_lightColor", 0.0f, 1.0f, 0.0f, renderer.highlightOpacity);
 				highlightShader.SetUniformMat4fv("u_mvp", glm::value_ptr(mvp));
 				for (int i = 0; i < renderer.pixelID.size(); ++i) {
-					crytek.Draw(GL_TRIANGLES, renderer.pixelID[i].drawID, renderer.pixelID[i].primitiveID - 1, torso.updatingTriangle[i]);
+					human.Draw(GL_TRIANGLES, renderer.pixelID[i].drawID, renderer.pixelID[i].primitiveID - 1, torso.updatingTriangle[i]);
 				}
 				highlightShader.UnBind();
 
@@ -324,33 +267,36 @@ int main() {
 		}
 
 		{//debug cubes
-			debugCubeShader.Bind();
+			if (renderer.showDebugCubes) {
+				debugCubeShader.Bind();
 
-			debugCubeShader.SetUniform4f("u_lightColor", 1.0f, 1.0f, 1.0f, 1.0f);
-			for (int i = 0; i < torso.commonNodesPos.size(); ++i) {
-				model = glm::translate(glm::mat4(1.0f), torso.commonNodesPos[i]);
-				model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
-				mvp = projection * view * model;
-				debugCubeShader.SetUniformMat4fv("u_mvp", glm::value_ptr(mvp));
-				glBindVertexArray(nonTexCubeVao);
-				glDrawArrays(GL_TRIANGLES, 0, 36);
-				glBindVertexArray(0);
+				debugCubeShader.SetUniform4f("u_lightColor", 1.0f, 1.0f, 1.0f, 1.0f);
+				for (int i = 0; i < torso.commonVertexPosAdd.size(); ++i) {
+					model = glm::translate(glm::mat4(1.0f), glm::vec3(*(torso.commonVertexPosAdd[i].x),
+						*(torso.commonVertexPosAdd[i].y), *(torso.commonVertexPosAdd[i].z)));
+					model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
+					mvp = projection * view * model;
+					debugCubeShader.SetUniformMat4fv("u_mvp", glm::value_ptr(mvp));
+					glBindVertexArray(nonTexCubeVao);
+					glDrawArrays(GL_TRIANGLES, 0, 36);
+					glBindVertexArray(0);
+				}
+
+				debugCubeShader.UnBind();
 			}
-
-			debugCubeShader.UnBind();
 		}
 
 		{//GUI inputs
 			ImGui::Begin("Main Menu",NULL, ImGuiWindowFlags_NoMove );
 
 			ImGui::Separator();
-			ImGui::Checkbox("Is picking", &isPicking);
-			ImGui::Checkbox("Add triangle", &addTriangle);
+			ImGui::Checkbox("Is picking", &renderer.isPicking);
+			ImGui::Checkbox("Add triangle", &renderer.addTriangle);
 			ImGui::Separator();
 			if (ImGui::Button("Clear selection")) {
 				renderer.pixelID.clear();
 				renderer.primitiveIDStored.clear();
-				torso.commonNodesPos.clear();
+				torso.Clear();
 			}
 			if (ImGui::Button("Change position")) {
 				if(torso.updatingTriangle.size() >= 3) {
@@ -359,12 +305,12 @@ int main() {
 			}
 			ImGui::Separator();
 			ImGui::PushItemWidth(-110);
-			ImGui::SliderFloat("Selection Alpha\n", &highlightOpacity, 0.0f, 1.0f);
+			ImGui::SliderFloat("Selection Alpha\n", &renderer.highlightOpacity, 0.0f, 1.0f);
 			ImGui::SliderFloat("Torso", &torso.adjust, -1.0f, 5.0f);
 			if (ImGui::IsItemActive()) {
 				torso.Adjust();
 			}
-			ImGui::SliderFloat("Stomach", &adjustStomach, 0.0f, 1.0f);
+			ImGui::SliderFloat("Stomach", &renderer.adjustStomach, 0.0f, 1.0f);
 			if (ImGui::IsItemActive()) {
 				std::cout << "Stomach Active" << std::endl;
 			}
@@ -378,7 +324,7 @@ int main() {
 			ImGui::Begin("Logs");
 
 			ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
-			ImGui::Text(torso.commonVertex.c_str());
+			ImGui::Checkbox("Show debug cubes", &renderer.showDebugCubes);
 			if (!torso.updatingTriangle.empty() && torso.updatingTriangle.back().vert1Pos.x) {
 				ImGui::Text("v3: (%.3f, %.3f, %.3f)", *(torso.updatingTriangle.back().vert3Pos.x), *(torso.updatingTriangle.back().vert3Pos.y),
 					*(torso.updatingTriangle.back().vert3Pos.z));
@@ -429,13 +375,9 @@ void ProcessInput(GLFWwindow* window) {
 		camera.ProcessKeyboard(RIGHT, renderer.deltaTime);
 
 	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
-		stopRendering = true;
+		renderer.stopRendering = true;
 	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
-		stopRendering = false;
-	
-	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
-		isPicking = !isPicking;
-
+		renderer.stopRendering = false;
 }
 
 void MouseCallback(GLFWwindow* window, double xpos, double ypos) {

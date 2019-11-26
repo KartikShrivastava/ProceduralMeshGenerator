@@ -141,5 +141,6 @@
     <None Include="src\shaders\11_TestVS.glsl" />
     <None Include="src\shaders\12_PickingFS.glsl" />
     <None Include="src\shaders\4_VertexShader.glsl" />
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>
